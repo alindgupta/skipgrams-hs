@@ -1,9 +1,10 @@
 -- | Implementation of the skipgram algorithm in Haskell
--- IMPORTANT - the algorithm here only calculate skipgrams for
+-- Note - the algorithm here only calculate skipgrams for
 -- the context on the right, not simultaneously left+right contexts
 
 
 {-# OPTIONS_GHC -fwarn-unused-matches -fwarn-incomplete-patterns #-}
+
 
 -- | Generate n-skip k-grams from a list of Ints
 -- only for the first element in the list
@@ -50,4 +51,3 @@ rollSkipgrams (x:xs) n k = paddedSkipgrams (x:xs) n k ++ rollSkipgrams xs n k
 -- a given list, filter valid ngrams (i.e. those without a pad element)
 validSkipgrams :: [Int] -> Int -> Int -> [[Int]]
 validSkipgrams =  ((filter (notElem (-1)) . ) . ) . rollSkipgrams
-
