@@ -1,10 +1,13 @@
--- | Implementation of the skipgram algorithm in Haskell
--- Note - the algorithm here only calculate skipgrams for
--- the context on the right, not simultaneously left+right contexts
+{- |
+   Module      : Skipgrams.hs
+   Maintainer  : Alind Gupta <alind.gupta@mail.utoronto.ca>
 
+Implementation of the skipgram algorithm in Haskell
+Note - the algorithm here only calculate skipgrams for
+the context on the right, not simultaneously left+right contexts
+-}
 
 {-# OPTIONS_GHC -fwarn-unused-matches -fwarn-incomplete-patterns #-}
-
 
 -- | Generate n-skip k-grams from a list of Ints
 -- only for the first element in the list
@@ -18,14 +21,18 @@ skipgrams (x:xs) n k = skipgrams' (x:xs) n k k 0
         skipgrams' [] _ _ _ _ = [[]]
         skipgrams' (x:_) 1 _ _ _ = [[x]]
         skipgrams' (x:xs) nGrams kSkips currKSkips iter =
-          concat [(x:) <$> 
-            (skipgrams' (drop currKSkips xs) (nGrams-1) (kSkips) (currKSkips) (iter+1))
-                | currKSkips <- range kSkips currKSkips iter]
+          concat [(x:)
+                  <$> (skipgrams'
+                       (drop currKSkips xs)
+                       (nGrams-1)
+                       kSkips
+                       currKSkips
+                       (iter+1))
+                 | currKSkips <- range kSkips currKSkips iter]
         range s c i = if i == 0
                           then [0..s]
                           else [0..(s-c)]
         {-# INLINE range #-}
-
 
 -- | Wrapper for skipgrams
 -- given a finite list, this function will pad -1 if required
@@ -36,7 +43,6 @@ paddedSkipgrams :: [Int]        -- ^ list of any size
 paddedSkipgrams [] _ _ = [[]]
 paddedSkipgrams x n k = skipgrams (x ++ repeat (-1)) n k
 
-
 -- | Generate n-skip k-grams by rolling along
 -- a given list (i.e. all possible n-skip k-grams)
 rollSkipgrams :: [Int]          -- ^ finite list
@@ -45,7 +51,6 @@ rollSkipgrams :: [Int]          -- ^ finite list
               -> [[Int]]
 rollSkipgrams [] _ _ = []
 rollSkipgrams (x:xs) n k = paddedSkipgrams (x:xs) n k ++ rollSkipgrams xs n k
-
 
 -- | Generate n-skip k-grams by rolling along
 -- a given list, filter valid ngrams (i.e. those without a pad element)
